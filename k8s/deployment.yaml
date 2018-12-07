@@ -1,0 +1,24 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: ex-cluster
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: ex-cluster
+    spec:
+      containers:
+        - name: ex-cluster
+          # the same name and tag must be used when building the image
+          image: ex_cluster:local
+          # use Never so the image is grabbed locally, for demo purposes
+          imagePullPolicy: Never
+          env:
+            - name: MY_POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: NODE_COOKIE
+              value: "cookie"

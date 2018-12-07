@@ -3,21 +3,12 @@ defmodule ExCluster do
   require Logger
 
   def start(_type, _args) do
-    Logger.info("ExCluster application started")
+    Logger.info("ExCluster application started: DSC")
 
-    case System.get_env("NODES") do
-      nodes when is_binary(nodes) ->
-        nodes
-        # convert list of nodes into atoms of node names
-        |> String.split(",")
-        |> Enum.map(&String.to_atom/1)
-        # connect to all nodes to make a cluster
-        |> Enum.each(&Node.connect/1)
-      _ ->
-        nil
-    end
+    topologies = Application.get_env(:libcluster, :topologies)
 
     children = [
+      { Cluster.Supervisor, [topologies, [name: ExCluster.ClusterSupervisor]] },
       { ExCluster.StateHandoff, [] },
       { Horde.Registry, [name: ExCluster.Registry, keys: :unique] },
       { Horde.Supervisor, [name: ExCluster.OrderSupervisor, strategy: :one_for_one ] },
