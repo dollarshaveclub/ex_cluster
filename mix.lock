@@ -1,0 +1,5 @@
+%{
+  "delta_crdt": {:hex, :delta_crdt, "0.3.0", "c84803723edd6d0c9597a3e17ba0843bc6bef2e4997b5cd6d5865ba3e76acddd", [:mix], [], "hexpm"},
+  "horde": {:hex, :horde, "0.3.0", "aafcf89b4b3720aa5e268b60cfc276b16e4e44253162de01907ad7ea17953b74", [:mix], [{:delta_crdt, "~> 0.2", [hex: :delta_crdt, repo: "hexpm", optional: false]}, {:xxhash, "~> 0.1", [hex: :xxhash, repo: "hexpm", optional: false]}], "hexpm"},
+  "xxhash": {:hex, :xxhash, "0.2.1", "ab0893a8124f3c11116c57e500485dc5f67817d1d4c44f0fff41f3fd3c590607", [:mix], [], "hexpm"},
+}

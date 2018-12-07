@@ -22,7 +22,7 @@ defmodule ExCluster.Order do
   end
   
   defp via_tuple(customer) do
-    { :via, Registry, { ExCluster.Registry, customer } }
+    { :via, Horde.Registry, { ExCluster.Registry, customer } }
   end
   
   def init(customer), do: { :ok, { customer, [] } }
