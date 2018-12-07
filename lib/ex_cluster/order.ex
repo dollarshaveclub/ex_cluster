@@ -25,7 +25,11 @@ defmodule ExCluster.Order do
     { :via, Horde.Registry, { ExCluster.Registry, customer } }
   end
   
-  def init(customer), do: { :ok, { customer, [] } }
+  def init(customer) do
+    Process.flag(:trap_exit, true)
+    order_contents = ExCluster.StateHandoff.pickup(customer)
+    { :ok, { customer, order_contents } }
+  end
   
   def handle_cast({ :add, new_order_contents }, { customer, order_contents }) do
     { :noreply, { customer, order_contents ++ new_order_contents } }
@@ -33,5 +37,10 @@ defmodule ExCluster.Order do
   
   def handle_call({ :contents }, _from, state = { _, order_contents }) do
     { :reply, order_contents, state }
+  end
+
+  def terminate(reason, { customer, order_contents }) do
+    ExCluster.StateHandoff.handoff(customer, order_contents)
+    :ok
   end
 end

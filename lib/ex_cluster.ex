@@ -18,6 +18,7 @@ defmodule ExCluster do
     end
 
     children = [
+      { ExCluster.StateHandoff, [] },
       { Horde.Registry, [name: ExCluster.Registry, keys: :unique] },
       { Horde.Supervisor, [name: ExCluster.OrderSupervisor, strategy: :one_for_one ] },
       %{
@@ -30,6 +31,7 @@ defmodule ExCluster do
               |> Enum.each(fn node ->
                 Horde.Cluster.join_hordes(ExCluster.OrderSupervisor, { ExCluster.OrderSupervisor, node })
                 Horde.Cluster.join_hordes(ExCluster.Registry, { ExCluster.Registry, node })
+                :ok = ExCluster.StateHandoff.join(node)
               end)
             end
           ]
