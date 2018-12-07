@@ -1,18 +1,15 @@
 defmodule ExCluster do
-  @moduledoc """
-  Documentation for ExCluster.
-  """
+  use Application
+  require Logger
 
-  @doc """
-  Hello world.
+  def start(_type, _args) do
+    Logger.info("ExCluster application started")
 
-  ## Examples
+    children = [
+      { Registry, keys: :unique, name: ExCluster.Registry },
+      { DynamicSupervisor, name: ExCluster.OrderSupervisor, strategy: :one_for_one },
+    ]
 
-      iex> ExCluster.hello()
-      :world
-
-  """
-  def hello do
-    :world
+    Supervisor.start_link(children, [strategy: :one_for_one, name: ExCluster.Supervisor])
   end
 end
