@@ -3,12 +3,21 @@ defmodule ExCluster do
   require Logger
 
   def start(_type, _args) do
-    Logger.info("ExCluster application started: DSC")
+    Logger.info("ExCluster application started: DSC v2")
 
-    topologies = Application.get_env(:libcluster, :topologies)
+    # topologies = Application.get_env(:libcluster, :topologies)
 
+    Logger.info("Pulling node addresses from DNS")
+    { :ok, { _, _, _, _, _, addresses } } = :inet_res.getbyname(:"ex-cluster.default.svc.cluster.local", :a)
+    Logger.info("Got the following node ips: #{inspect addresses}")
+    addresses
+    |> Enum.map(&:inet_parse.ntoa(&1))
+    |> Enum.map(&"ex_cluster@#{&1}")
+    |> Enum.map(&String.to_atom(&1))
+    |> Enum.map(&Node.connect(&1))
+    Logger.info("Connected to all the Nodes")
     children = [
-      { Cluster.Supervisor, [topologies, [name: ExCluster.ClusterSupervisor]] },
+      # { Cluster.Supervisor, [topologies, [name: ExCluster.ClusterSupervisor]] },
       { ExCluster.StateHandoff, [] },
       { Horde.Registry, [name: ExCluster.Registry, keys: :unique] },
       { Horde.Supervisor, [name: ExCluster.OrderSupervisor, strategy: :one_for_one ] },

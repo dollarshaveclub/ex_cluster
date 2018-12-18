@@ -1,8 +1,26 @@
-apiVersion: extensions/v1beta1
-kind: Deployment
+apiVersion: v1
+kind: Service
+metadata:
+  name: ex-cluster
+  labels:
+    app: ex-cluster
+spec:
+  ports:
+  - port: 80
+    name: web
+  clusterIP: None
+  selector:
+    app: ex-cluster
+---
+apiVersion: apps/v1
+kind: StatefulSet
 metadata:
   name: ex-cluster
 spec:
+  selector:
+    matchLabels:
+      app: ex-cluster
+  serviceName: "ex-cluster"
   replicas: 2
   template:
     metadata:
@@ -13,7 +31,7 @@ spec:
         - name: ex-cluster
           # the same name and tag must be used when building the image
           image: ex_cluster:local
-          # use Never so the image is grabbed locally, for demo purposes
+          # # use Never so the image is grabbed locally, for demo purposes
           imagePullPolicy: Never
           env:
             - name: MY_POD_IP
